@@ -2,9 +2,6 @@ const factText = document.querySelector(".fact");
 const factBtn = document.querySelector("button");
 const authorName = document.querySelector(".name");
 const catImage = document.querySelector("#img");
-let currentFactIndex = 0;
-
-factBtn.addEventListener("click", newCatFact);
 
 function newCatFact() {
   factBtn.classList.add("loading");
@@ -18,61 +15,40 @@ function newCatFact() {
     "author": "Emily Williams"
   };
   fetch('http://localhost:3000/cats', {
-    method: 'POST',
-    body: JSON.stringify(cat),
+    method: 'GET',
+    body: JSON.stringify(cat), // Define and populate the cat object
     headers: {
       'Content-Type': 'application/json'
     }
   })
     .then(response => response.json())
     .then(result => {
-      currentFactIndex++;
-      fetchCatFact(currentFactIndex);
-    })
-    .catch(error => {
-      console.error('Error posting new cat fact:', error);
-      handleFetchError();
-    });
-}
-
-function fetchCatFact(index) {
-  fetch('http://localhost:3000/cats?index=`${index}`')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (data.length > 0) {
-        factText.innerText = data[0].facts;
-        authorName.innerText = data[0].author;
-      } else {
-        factText.innerText = "No more facts available.";
-        authorName.innerText = "";
-      }
+      factText.innerText = result.facts;
+      authorName.innerText = result.author;
       factBtn.classList.remove("loading");
       factBtn.innerText = "New Fact";
     })
     .catch(error => {
-      console.error('Error fetching cat facts:', error);
-      handleFetchError();
+      console.error('Error fetching cat fact:', error);
+      factText.innerText = "Failed to fetch fact. Please try again later.";
+      authorName.innerText = "";
+      factBtn.classList.remove("loading");
+      factBtn.innerText = "New Fact";
     });
 }
 
-function handleFetchError() {
-  factText.innerText = "Failed to fetch facts. Please try again later.";
-  authorName.innerText = "";
-  factBtn.classList.remove("loading");
-  factBtn.innerText = "New Fact";
-}
+factBtn.addEventListener("click", newCatFact);
 
 catImage.addEventListener("mouseover", () => {
-  catImage.style.transform = "scale(1.0)"; // Zoom in effect
-  catImage.style.transition = "transform 0.3s"; // Smooth transition
+  catImage.style.transform = "scale(1.0)"; 
+  catImage.style.transition = "transform 0.3s"; 
 });
 
 catImage.addEventListener("mouseout", () => {
-  catImage.style.transform = "scale(0.9)"; // Zoom out effect
-  catImage.style.transition = "transform 0.3s"; // Smooth transition
+  catImage.style.transform = "scale(0.9)"; 
+  catImage.style.transition = "transform 0.3s"; 
+});
+
+factBtn.addEventListener("click", () => {
+  newCatFact(); // Call newCatFact() function when the button is clicked
 });
